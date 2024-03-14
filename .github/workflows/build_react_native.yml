@@ -28,8 +28,7 @@ jobs:
       - name: Upload artifact
         uses: actions/Upload-pages-artifact@v2
         with:
-          path: dist
-          if-no-files-found: error
+          path: build # Modifiez le chemin vers le dossier contenant vos fichiers à archiver
   deploy:
     environment:
       name: github-pages
