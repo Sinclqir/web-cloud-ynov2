@@ -17,16 +17,28 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install, build and test
-        run:
-          npm install
-          npm run build --if-present
-          npm test
+      - name: npm ci, build and test
+        run: |
+          npm i
+          npm run predeploy
+      - name: Setup pages
+        id: pages
+        uses: actions/configure-pages@v3
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/Upload-pages-artifact@v2
         with:
-          name: build
-          path: build # Assurez-vous que le chemin est correct pour votre projet
+          path: dist
+          if-no-files-found: error
+      - name: Setup eas
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Install dependencies
+        run: npm i
+      # - name: Build App
+      #   run: eas build --platform android
+      
   deploy:
     environment:
       name: github-pages
@@ -40,12 +52,3 @@ jobs:
       - name: Deploy to Github pages
         id: deployment
         uses: actions/deploy-pages@v2
-      - name: 🏗️ Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-      - name: 🏗️ install dependencies
-        run: npm install
-      - name: 🚀 Build app
-        run: eas build --platform android --non-interactive --no-wait
